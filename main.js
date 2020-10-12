@@ -11,7 +11,10 @@ function main()
     -0.5, 0.5,    // A 
     -0.5, -0.5,   // B
     0.5, -0.5,    // C
-    0.5, 0.5      // D
+    0.5, -0.5,    // C
+    0.5, 0.5,     // D
+    -0.5, 0.5,    // A 
+
   ];
 
   var positionBuffer = gl.createBuffer(); //pointer ke gl di alam gpu
@@ -44,9 +47,10 @@ function main()
 
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.viewport(100, 0, canvas.height, canvas.height)
 
-  var primitive = gl.TRIANGLE_FAN;
+  var primitive = gl.TRIANGLES;
   var offset = 0;
-  var count = 4;  // Jumlah verteks yang akan digambar
+  var count = 6;  // Jumlah verteks yang akan digambar
   gl.drawArrays(primitive, offset, count);
 }
