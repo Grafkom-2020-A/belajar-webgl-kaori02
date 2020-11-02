@@ -12,9 +12,8 @@ function main()
     -0.5, -0.5, 1.0, 0.0, 0.0,   // B
     0.5, -0.5, 1.0, 0.0, 0.0,    // C
     0.5, -0.5, 0.0, 0.0, 1.0,    // C
-    0.5, 0.5, 0.0, 0.0, 1.0,    // D
+    0.5, 0.5, 0.0, 0.0, 1.0,     // D
     -0.5, 0.5, 0.0, 0.0, 1.0,    // A 
-
   ];
 
   var vertexBuffer = gl.createBuffer(); //pointer ke gl di alam gpu
@@ -48,12 +47,31 @@ function main()
   gl.enableVertexAttribArray(aPosition);
   gl.enableVertexAttribArray(aColor);
 
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
-  gl.clear(gl.COLOR_BUFFER_BIT);
-  gl.viewport(100, 0, canvas.height, canvas.height);
+  gl.viewport(0, 0, canvas.width, canvas.height);
 
   var primitive = gl.TRIANGLES;
   var offset = 0;
   var count = 6;  // Jumlah verteks yang akan digambar
-  gl.drawArrays(primitive, offset, count);
+
+  var dx = 0;
+  var dy = 0;
+  var dz = 0;
+  var uDx = gl.getUniformLocation(shaderProgram, 'dx');
+  var uDy = gl.getUniformLocation(shaderProgram, 'dy');
+  var uDz = gl.getUniformLocation(shaderProgram, 'dz');
+  
+
+  function render() {
+    dx += 0.001;
+    dy += 0.001;
+    // dz += 0.01;
+    gl.uniform1f(uDx, dx);
+    gl.uniform1f(uDy, dy);
+    gl.uniform1f(uDz, dz);
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(primitive, offset, count);
+    requestAnimationFrame(render);
+  }
+  requestAnimationFrame(render);
 }
