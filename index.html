@@ -9,24 +9,19 @@
   <canvas id="myCanvas" width="800" height="600">
     Peramban tidak mendukung kanvas HTML5
   </canvas>
+  <script type="text/javascript" src="gl-matrix-min.js"></script>
   <script type="text/javascript" src="main.js"></script>
   <script id="vertexShaderCode" type="notjs">
     attribute vec2 a_position; //attribute gpu
     attribute vec3 a_color; //attribute gpu
     varying vec3 v_color;
-    uniform float dx;
-    uniform float dy;
-    uniform float dz;
+    uniform mat4 projection;
+    uniform mat4 view;
+    uniform mat4 model;
     void main()
     {
       v_color = a_color;
-      mat4 translasi = mat4(
-        1.0, 0.0, 0.0, 0.0,
-        0.0, 1.0, 0.0, 0.0,
-        0.0, 0.0, 1.0, 0.0,
-        dx, dy, dz, 1.0
-        );
-      gl_Position = translasi * vec4(a_position, 0.0, 1.0); //x,y,z,w skala -1 smpe 1
+      gl_Position = projection * view * model * vec4(a_position, 0.0, 1.0); //x,y,z,w skala -1 smpe 1
       gl_PointSize = 20.0;
     }
   </script>
