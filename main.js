@@ -82,7 +82,7 @@ function main()
   gl.enableVertexAttribArray(aPosition);
   gl.enableVertexAttribArray(aColor);
 
-  gl.viewport(0, 0, canvas.width, canvas.height);
+  gl.viewport(100, 0, canvas.height, canvas.height);
   gl.enable(gl.DEPTH_TEST);
 
   var primitive = gl.TRIANGLES;
@@ -114,10 +114,12 @@ function main()
 
   function render()
   {
+    var theta = glMatrix.glMatrix.toRadian(1); // 1 derajat
+    glMatrix.mat4.rotate(model, model, theta, [1.0, 1.0, 1.0]);
     // dx += 0.001;
     dz += 0.000;
     // Tambah translasi ke matriks model
-    model = glMatrix.mat4.create();
+    // model = glMatrix.mat4.create();
     // glMatrix.mat4.translate(model, model, [dx, 0.0, 0.0]);
     glMatrix.mat4.translate(model, model, [0.0, 0.0, dz]);
     gl.uniformMatrix4fv(uModel, false, model);
