@@ -12,25 +12,26 @@
   <script type="text/javascript" src="gl-matrix-min.js"></script>
   <script type="text/javascript" src="main.js"></script>
   <script id="vertexShaderCode" type="notjs">
-    attribute vec3 a_position; //attribute gpu
-    attribute vec3 a_color; //attribute gpu
-    varying vec3 v_color;
-    uniform mat4 projection;
-    uniform mat4 view;
-    uniform mat4 model;
+    attribute vec3 a_Position; //attribute gpu
+    attribute vec3 a_Color; //attribute gpu
+    varying vec3 v_Color;
+    uniform mat4 u_Projection;
+    uniform mat4 u_View;
+    uniform mat4 u_Model;
     void main()
     {
-      v_color = a_color;
-      gl_Position = projection * view * model * vec4(a_position, 1.0); //x,y,z,w skala -1 smpe 1
-      gl_PointSize = 20.0;
+      v_Color = a_Color;
+      gl_Position = u_Projection * u_View * u_Model * vec4(a_Position, 1.0); //x,y,z,w skala -1 smpe 1
     }
   </script>
   <script id="fragmentShaderCode" type="notjs">
     precision mediump float;
-    varying vec3 v_color;
+    varying vec3 v_Color;
+    uniform vec3 u_AmbientColor;
     void main()
     {
-      gl_FragColor = vec4(v_color, 1.0); //rgba
+      vec3 ambient = u_AmbientColor * v_Color; // pencahayaan merata (RGB) x warna objek (RGB)
+      gl_FragColor = vec4(ambient, 1.0); //rgba
     }
   </script>
 </body>

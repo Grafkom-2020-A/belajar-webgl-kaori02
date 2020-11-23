@@ -3,7 +3,6 @@ function main()
   var canvas = document.getElementById("myCanvas");
   var gl = canvas.getContext("webgl");
 
- 
   var vertices = [];
 
   var cubePoints = [
@@ -75,8 +74,8 @@ function main()
   gl.useProgram(shaderProgram);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-  var aPosition = gl.getAttribLocation(shaderProgram, "a_position");
-  var aColor = gl.getAttribLocation(shaderProgram, "a_color");
+  var aPosition = gl.getAttribLocation(shaderProgram, "a_Position");
+  var aColor = gl.getAttribLocation(shaderProgram, "a_Color");
   gl.vertexAttribPointer(aPosition, 3, gl.FLOAT, false, 6 * Float32Array.BYTES_PER_ELEMENT, 0);
   gl.vertexAttribPointer(aColor, 3, gl.FLOAT, false, 6 * Float32Array.BYTES_PER_ELEMENT, 3 * Float32Array.BYTES_PER_ELEMENT);
   gl.enableVertexAttribArray(aPosition);
@@ -100,28 +99,22 @@ function main()
   var projection = glMatrix.mat4.create();
   glMatrix.mat4.perspective(
     projection,
-    glMatrix.glMatrix.toRadian(90), //fov dalam radian
-    1.0,  //rasio aspek
-    0.5,  //near
-    10.0  //far
+    glMatrix.glMatrix.toRadian(90), // fov dalam radian
+    1.0,  // rasio aspek
+    0.5,  // near
+    10.0  // far
   );
-  var uModel = gl.getUniformLocation(shaderProgram, 'model');
-  var uView = gl.getUniformLocation(shaderProgram, 'view');
-  var uProjection = gl.getUniformLocation(shaderProgram, 'projection');
+  var uModel = gl.getUniformLocation(shaderProgram, 'u_Model');
+  var uView = gl.getUniformLocation(shaderProgram, 'u_View');
+  var uProjection = gl.getUniformLocation(shaderProgram, 'u_Projection');
 
-  var dx = 0.0;
-  var dz = 0.0;
+  var uAmbientColor = gl.getUniformLocation(shaderProgram, 'u_AmbientColor');
+  gl.uniform3fv(uAmbientColor, [0.2, 0.4, 0.6]);
 
   function render()
   {
     var theta = glMatrix.glMatrix.toRadian(1); // 1 derajat
     glMatrix.mat4.rotate(model, model, theta, [1.0, 1.0, 1.0]);
-    // dx += 0.001;
-    dz += 0.000;
-    // Tambah translasi ke matriks model
-    // model = glMatrix.mat4.create();
-    // glMatrix.mat4.translate(model, model, [dx, 0.0, 0.0]);
-    glMatrix.mat4.translate(model, model, [0.0, 0.0, dz]);
     gl.uniformMatrix4fv(uModel, false, model);
     gl.uniformMatrix4fv(uView, false, view);
     gl.uniformMatrix4fv(uProjection, false, projection);
