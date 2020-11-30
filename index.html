@@ -14,24 +14,40 @@
   <script id="vertexShaderCode" type="notjs">
     attribute vec3 a_Position; //attribute gpu
     attribute vec3 a_Color; //attribute gpu
+    attribute vec3 a_Normal;
+
     varying vec3 v_Color;
     uniform mat4 u_Projection;
     uniform mat4 u_View;
     uniform mat4 u_Model;
+
+    uniform vec3 u_DiffuseColor;
+    uniform vec3 u_DiffusePosition;
+    uniform mat3 u_Normal;  // Sebagai model matrixnya vektor normal
+    uniform vec3 u_AmbientColor;
+
     void main()
     {
-      v_Color = a_Color;
       gl_Position = u_Projection * u_View * u_Model * vec4(a_Position, 1.0); //x,y,z,w skala -1 smpe 1
+      vec3 n_Normal = normalize(u_Normal * a_Normal);
+
+      // Vektor cahaya = titik sumber cahaya - titik verteks
+      vec3 vertexPos = (u_Model * vec4(a_Position, 1.0)).xyz;
+      vec3 lightPos = u_DiffusePosition;
+      vec3 n_Light = normalize(lightPos - vertexPos);
+
+      float dotNL = max(dot(n_Normal, n_Light), 0.0);
+      vec3 diffuse = a_Color * u_DiffuseColor * dotNL;
+      vec3 ambient = a_Color * u_AmbientColor;
+      v_Color = ambient + diffuse;
     }
   </script>
   <script id="fragmentShaderCode" type="notjs">
     precision mediump float;
     varying vec3 v_Color;
-    uniform vec3 u_AmbientColor;
     void main()
     {
-      vec3 ambient = u_AmbientColor * v_Color; // pencahayaan merata (RGB) x warna objek (RGB)
-      gl_FragColor = vec4(ambient, 1.0); //rgba
+      gl_FragColor = vec4(v_Color, 1.0); //rgba
     }
   </script>
 </body>

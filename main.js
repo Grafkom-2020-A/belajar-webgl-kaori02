@@ -27,6 +27,17 @@ function main()
     []
   ];
 
+  var cubeNormals = [
+    [],
+    [0.0, 0.0, 1.0],    // depan
+    [1.0, 0.0, 0.0],    // kanan
+    [0.0, 1.0, 0.0],    // atas
+    [-1.0, 0.0, 0.0],    // kiri
+    [0.0, 0.0, -1.0],    // belakang
+    [0.0, -1.0, 0.0],    // bawah
+    []
+  ];
+
   function quad(a, b, c, d)
   {
     var indices = [a, b, c, c, d, a];
@@ -39,6 +50,10 @@ function main()
       for (var j = 0; j < 3; j++)
       {
         vertices.push(cubeColors[a][j]);
+      }
+      for (var j = 0; j < 3; j++)
+      {
+        vertices.push(cubeNormals[a][j]);
       }
     }
   }
@@ -76,10 +91,16 @@ function main()
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
   var aPosition = gl.getAttribLocation(shaderProgram, "a_Position");
   var aColor = gl.getAttribLocation(shaderProgram, "a_Color");
-  gl.vertexAttribPointer(aPosition, 3, gl.FLOAT, false, 6 * Float32Array.BYTES_PER_ELEMENT, 0);
-  gl.vertexAttribPointer(aColor, 3, gl.FLOAT, false, 6 * Float32Array.BYTES_PER_ELEMENT, 3 * Float32Array.BYTES_PER_ELEMENT);
+  var aNormal = gl.getAttribLocation(shaderProgram, "a_Normal");
+
+  gl.vertexAttribPointer(aPosition, 3, gl.FLOAT, false, 9 * Float32Array.BYTES_PER_ELEMENT, 0);
+  gl.vertexAttribPointer(aColor, 3, gl.FLOAT, false, 9 * Float32Array.BYTES_PER_ELEMENT, 3 * Float32Array.BYTES_PER_ELEMENT);
+  gl.vertexAttribPointer(aNormal, 3, gl.FLOAT, false, 9 * Float32Array.BYTES_PER_ELEMENT, 6 * Float32Array.BYTES_PER_ELEMENT);
+  
   gl.enableVertexAttribArray(aPosition);
   gl.enableVertexAttribArray(aColor);
+  gl.enableVertexAttribArray(aNormal);
+
 
   gl.viewport(100, 0, canvas.height, canvas.height);
   gl.enable(gl.DEPTH_TEST);
@@ -109,7 +130,16 @@ function main()
   var uProjection = gl.getUniformLocation(shaderProgram, 'u_Projection');
 
   var uAmbientColor = gl.getUniformLocation(shaderProgram, 'u_AmbientColor');
-  gl.uniform3fv(uAmbientColor, [0.2, 0.4, 0.6]);
+  gl.uniform3fv(uAmbientColor, [0.2, 0.2, 0.2]);
+  
+  var uDiffuseColor = gl.getUniformLocation(shaderProgram, 'u_DiffuseColor');
+  gl.uniform3fv(uDiffuseColor, [1.0, 1.0, 1.0]);
+  
+  var uDiffusePosition = gl.getUniformLocation(shaderProgram, 'u_DiffusePosition');
+  gl.uniform3fv(uDiffusePosition, [1.0, 2.0, 1.0]);
+  
+  var uNormal = gl.getUniformLocation(shaderProgram, 'u_Normal');
+  
 
   function render()
   {
@@ -118,6 +148,11 @@ function main()
     gl.uniformMatrix4fv(uModel, false, model);
     gl.uniformMatrix4fv(uView, false, view);
     gl.uniformMatrix4fv(uProjection, false, projection);
+
+    var normal = glMatrix.mat3.create();
+    glMatrix.mat3.normalFromMat4(normal, model);
+    gl.uniformMatrix3fv(uNormal, false, normal);
+
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.drawArrays(primitive, offset, count);
