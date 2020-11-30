@@ -15,39 +15,41 @@
     attribute vec3 a_Position; //attribute gpu
     attribute vec3 a_Color; //attribute gpu
     attribute vec3 a_Normal;
-
+    varying vec3 v_Position;
     varying vec3 v_Color;
+    varying vec3 v_Normal;
     uniform mat4 u_Projection;
     uniform mat4 u_View;
     uniform mat4 u_Model;
 
-    uniform vec3 u_DiffuseColor;
-    uniform vec3 u_DiffusePosition;
     uniform mat3 u_Normal;  // Sebagai model matrixnya vektor normal
-    uniform vec3 u_AmbientColor;
 
     void main()
     {
       gl_Position = u_Projection * u_View * u_Model * vec4(a_Position, 1.0); //x,y,z,w skala -1 smpe 1
-      vec3 n_Normal = normalize(u_Normal * a_Normal);
-
-      // Vektor cahaya = titik sumber cahaya - titik verteks
-      vec3 vertexPos = (u_Model * vec4(a_Position, 1.0)).xyz;
-      vec3 lightPos = u_DiffusePosition;
-      vec3 n_Light = normalize(lightPos - vertexPos);
-
-      float dotNL = max(dot(n_Normal, n_Light), 0.0);
-      vec3 diffuse = a_Color * u_DiffuseColor * dotNL;
-      vec3 ambient = a_Color * u_AmbientColor;
-      v_Color = ambient + diffuse;
+      v_Position = (u_Model * vec4(a_Position, 1.0)).xyz;
+      v_Color = a_Color;
+      v_Normal = normalize(u_Normal * a_Normal);
     }
   </script>
   <script id="fragmentShaderCode" type="notjs">
     precision mediump float;
+    varying vec3 v_Position;
     varying vec3 v_Color;
-    void main()
-    {
-      gl_FragColor = vec4(v_Color, 1.0); //rgba
+    varying vec3 v_Normal;
+
+    uniform vec3 u_AmbientColor;
+    uniform vec3 u_DiffuseColor;
+    uniform vec3 u_DiffusePosition;
+    
+    void main() {
+      // Vektor cahaya = titik sumber cahaya - titik verteks
+      vec3 lightPos = u_DiffusePosition;
+      vec3 v_light = normalize(lightPos - v_Position);
+      float dotNL = max(dot(v_Normal, v_light), 0.0);
+      vec3 diffuse = v_Color * u_DiffuseColor * dotNL;
+      vec3 ambient = v_Color * u_AmbientColor;
+      gl_FragColor = vec4(ambient + diffuse, 1.0);
     }
   </script>
 </body>
